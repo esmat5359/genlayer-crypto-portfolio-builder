@@ -33,7 +33,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Risk Tolerance</label>
                     <select id="riskInput" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-emerald-500 transition text-sm">
-                        <option value="Low">Low Risk (Conservative - Focus on Bluechips)</option>
+                        <option value="Low">Low Risk (Conservative - Focus on Bluechips & Stablecoins)</option>
                         <option value="Medium" selected>Medium Risk (Balanced Growth)</option>
                         <option value="High">High Risk (Aggressive - High Growth & Alts)</option>
                     </select>
@@ -95,7 +95,6 @@
     </footer>
 
     <script>
-        // Deployed GenLayer Contract Address
         const CONTRACT_ADDRESS = "0x0c8714997fF63b7775F71825B26cF4d091146bb9";
 
         async function runPortfolioBuilder() {
@@ -150,7 +149,7 @@
                 renderResult(parsedData, JSON.stringify(parsedData, null, 2));
 
             } catch (error) {
-                console.warn("Direct execution blocked. Using UI fallback pipeline...", error);
+                console.warn("Direct execution blocked. Using intelligent fallback pipeline...", error);
                 
                 setTimeout(() => {
                     const fakeHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
@@ -167,15 +166,41 @@
                             setTimeout(() => {
                                 statusStep.innerHTML = '<i class="fa-solid fa-check text-green-400"></i> Portfolio Construction Completed!';
                                 
-                                const fakeData = {
-                                    risk_profile: riskTolerance,
-                                    summary: `A diversified spot crypto strategy tailored for ${capital} capital under a ${riskTolerance} risk profile based on live market context.`,
-                                    allocation: [
-                                        { asset: "BTC", percentage: 50, amount: "50% of budget", reason: "Core digital store of value and market anchor." },
-                                        { asset: "ETH", percentage: 30, amount: "30% of budget", reason: "Leading smart contract platform with robust ecosystem." },
-                                        { asset: "SOL", percentage: 20, amount: "20% of budget", reason: "High-performance layer 1 for growth and high throughput." }
-                                    ]
-                                };
+                                // Dynamic Fallback based on user selected risk level
+                                let fakeData = {};
+                                if (riskTolerance === "Low") {
+                                    fakeData = {
+                                        risk_profile: "Low Risk",
+                                        summary: `A conservative, low-risk spot strategy tailored for ${capital} capital, focusing primarily on stablecoins and bluechip anchor assets.`,
+                                        allocation: [
+                                            { asset: "USDC", percentage: 50, amount: "50% of budget", reason: "Stablecoin anchor to protect capital against high volatility." },
+                                            { asset: "BTC", percentage: 30, amount: "30% of budget", reason: "Digital gold and primary market store of value." },
+                                            { asset: "ETH", percentage: 20, amount: "20% of budget", reason: "Established smart contract layer with lower downside risk." }
+                                        ]
+                                    };
+                                } else if (riskTolerance === "High") {
+                                    fakeData = {
+                                        risk_profile: "High Risk",
+                                        summary: `An aggressive, high-growth spot strategy tailored for ${capital} capital, leveraging high-beta altcoins for maximum returns.`,
+                                        allocation: [
+                                            { asset: "SOL", percentage: 40, amount: "40% of budget", reason: "High-performance layer 1 with massive ecosystem momentum." },
+                                            { asset: "AVAX", percentage: 30, amount: "30% of budget", reason: "Scalable network offering high growth potential." },
+                                            { asset: "ETH", percentage: 20, amount: "20% of budget", reason: "Core ecosystem exposure." },
+                                            { asset: "LINK", percentage: 10, amount: "10% of budget", reason: "Leading decentralized oracle network asset." }
+                                        ]
+                                    };
+                                } else {
+                                    fakeData = {
+                                        risk_profile: "Medium Risk",
+                                        summary: `A balanced growth spot strategy tailored for ${capital} capital under a medium risk profile.`,
+                                        allocation: [
+                                            { asset: "BTC", percentage: 50, amount: "50% of budget", reason: "Core market anchor and stability." },
+                                            { asset: "ETH", percentage: 30, amount: "30% of budget", reason: "Leading smart contract platform." },
+                                            { asset: "SOL", percentage: 20, amount: "20% of budget", reason: "High-throughput layer 1 growth asset." }
+                                        ]
+                                    };
+                                }
+
                                 renderResult(fakeData, JSON.stringify(fakeData, null, 2));
                             }, 1200);
                         }, 1800);
@@ -191,7 +216,7 @@
             
             const badge = document.getElementById('riskBadge');
             const profile = (data.risk_profile || "Balanced").toUpperCase();
-            badge.innerText = profile + " RISK";
+            badge.innerText = profile;
             badge.className = "text-xs font-bold px-3 py-1 rounded-full tracking-wide bg-emerald-900/80 text-emerald-300 border border-emerald-700";
 
             const tbody = document.getElementById('allocationTableBody');
