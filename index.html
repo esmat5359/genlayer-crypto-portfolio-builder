@@ -95,7 +95,7 @@
     </footer>
 
     <script>
-        const CONTRACT_ADDRESS = "0x0c8714997fF63b7775F71825B26cF4d091146bb9";
+        const CONTRACT_ADDRESS = "0xec7C295d3237B0271D6b638BE250b6F54d9a3540";
 
         async function runPortfolioBuilder() {
             const capital = document.getElementById('capitalInput').value.trim();
@@ -149,63 +149,8 @@
                 renderResult(parsedData, JSON.stringify(parsedData, null, 2));
 
             } catch (error) {
-                console.warn("Direct execution blocked. Using intelligent fallback pipeline...", error);
-                
-                setTimeout(() => {
-                    const fakeHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
-                    statusStep.innerHTML = '<i class="fa-solid fa-globe animate-pulse text-emerald-400"></i> Executing writeContract: Fetching web market context & running consensus...';
-                    txHashVal.innerText = fakeHash.substring(0, 18) + '...';
-                    txHashDisplay.classList.remove('hidden');
-
-                    setTimeout(() => {
-                        statusStep.innerHTML = '<i class="fa-solid fa-network-wired animate-spin text-teal-400"></i> Waiting for multi-validator consensus (FINALIZED)...';
-
-                        setTimeout(() => {
-                            statusStep.innerHTML = '<i class="fa-solid fa-database text-green-400"></i> Calling readContract: get_last_portfolio()...';
-
-                            setTimeout(() => {
-                                statusStep.innerHTML = '<i class="fa-solid fa-check text-green-400"></i> Portfolio Construction Completed!';
-                                
-                                // Dynamic Fallback based on user selected risk level
-                                let fakeData = {};
-                                if (riskTolerance === "Low") {
-                                    fakeData = {
-                                        risk_profile: "Low Risk",
-                                        summary: `A conservative, low-risk spot strategy tailored for ${capital} capital, focusing primarily on stablecoins and bluechip anchor assets.`,
-                                        allocation: [
-                                            { asset: "USDC", percentage: 50, amount: "50% of budget", reason: "Stablecoin anchor to protect capital against high volatility." },
-                                            { asset: "BTC", percentage: 30, amount: "30% of budget", reason: "Digital gold and primary market store of value." },
-                                            { asset: "ETH", percentage: 20, amount: "20% of budget", reason: "Established smart contract layer with lower downside risk." }
-                                        ]
-                                    };
-                                } else if (riskTolerance === "High") {
-                                    fakeData = {
-                                        risk_profile: "High Risk",
-                                        summary: `An aggressive, high-growth spot strategy tailored for ${capital} capital, leveraging high-beta altcoins for maximum returns.`,
-                                        allocation: [
-                                            { asset: "SOL", percentage: 40, amount: "40% of budget", reason: "High-performance layer 1 with massive ecosystem momentum." },
-                                            { asset: "AVAX", percentage: 30, amount: "30% of budget", reason: "Scalable network offering high growth potential." },
-                                            { asset: "ETH", percentage: 20, amount: "20% of budget", reason: "Core ecosystem exposure." },
-                                            { asset: "LINK", percentage: 10, amount: "10% of budget", reason: "Leading decentralized oracle network asset." }
-                                        ]
-                                    };
-                                } else {
-                                    fakeData = {
-                                        risk_profile: "Medium Risk",
-                                        summary: `A balanced growth spot strategy tailored for ${capital} capital under a medium risk profile.`,
-                                        allocation: [
-                                            { asset: "BTC", percentage: 50, amount: "50% of budget", reason: "Core market anchor and stability." },
-                                            { asset: "ETH", percentage: 30, amount: "30% of budget", reason: "Leading smart contract platform." },
-                                            { asset: "SOL", percentage: 20, amount: "20% of budget", reason: "High-throughput layer 1 growth asset." }
-                                        ]
-                                    };
-                                }
-
-                                renderResult(fakeData, JSON.stringify(fakeData, null, 2));
-                            }, 1200);
-                        }, 1800);
-                    }, 1200);
-                }, 800);
+                console.error("Execution failed:", error);
+                statusStep.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i> Error: ${error.message || "Transaction failed."}`;
             } finally {
                 buildBtn.disabled = false;
             }
